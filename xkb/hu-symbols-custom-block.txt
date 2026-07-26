@@ -1,0 +1,74 @@
+xkb_symbols "102_qwertz_comma_dead_mac_full" {
+    include "hu(102_qwertz_comma_dead_mac)"
+    name[Group1] = "Hungarian (macOS-compatible, Apple Aluminium)";
+
+    // @ already correct: Alt+q = at (kept from base)
+
+    // | = Alt+í
+    key <LSGT> { [ iacute, Iacute, less, greater ] };
+
+    // \ = Alt+ü
+    key <AE11> { [ udiaeresis, Udiaeresis, backslash, diaeresis ] };
+
+    // # = Alt+Shift+3
+    key <AE03> { [ 3, plus, asciicircum, numbersign ] };
+
+    // $ = Alt+Shift+4
+    key <AE04> { [ 4, exclam, dead_breve, dollar ] };
+
+    // & = Alt+1
+    key <AE01> { [ 1, apostrophe, ampersand, dead_tilde ] };
+
+    // © = Alt+g
+    key <AC05> { [ g, G, copyright, ENG ] };
+    // clear the now-vacated bracketleft that used to live on f
+    // (VoidSymbol truly blanks the level; NoSymbol would just inherit the old value)
+    key <AC04> { [ f, F, VoidSymbol, ordfeminine ] };
+
+    // ; = Alt+, (comma's own Alt); : = Alt+. (period's own Alt) -- no more duplication
+    key <AB08> { [ comma, question, semicolon, asterisk ] };
+    key <AB09> { [ period, colon, ellipsis, division ] };        // Alt+. = … (was duplicate colon)
+
+    // < = Alt+Shift+y (already correct in base)
+    // > = Alt+Shift+x (already correct in base)
+
+    // [ = Alt+8 , ] = Alt+9
+    key <AE08> { [ 8, parenleft, bracketleft, abovedot ] };
+    key <AE09> { [ 9, parenright, bracketright, acute ] };
+
+    // { = Alt+7 , } = Alt+ö
+    key <AE07> { [ 7, equal, braceleft, dead_grave ] };
+    key <AE10> { [ odiaeresis, Odiaeresis, braceright, doubleacute ] };
+
+    // ~ = Alt+ú (tilde); ` = Alt+ű ("tick"/backtick, direct, non-dead)
+    key <AD12> { [ uacute, Uacute, asciitilde, dead_macron ] };
+    key <BKSL> { [ udoubleacute, Udoubleacute, grave, dead_breve ] };
+
+    // Remove leftover "vanilla PC Hungarian" AltGr duplicates so every
+    // symbol has exactly one, native-mac position (per user request: no
+    // Windows-style AltGr+v=@ etc. left over from the base hu(...) layout).
+    key <AB04> { [ v, V, VoidSymbol, singlelowquotemark ] };      // was Alt+v = @ (dup of Alt+q)
+    key <AD01> { [ q, Q, at, VoidSymbol ] };                      // was Alt+Shift+q = \ (dup of Alt+ü)
+    key <AB03> { [ c, C, VoidSymbol, VoidSymbol ] };              // was Alt+c = & (dup of Alt+1), Alt+Shift+c = © (dup of Alt+g)
+    key <AC08> { [ k, K, lstroke, VoidSymbol ] };                 // was Alt+Shift+k = & (dup of Alt+1)
+    key <AB05> { [ b, B, VoidSymbol, leftsinglequotemark ] };     // was Alt+b = { (dup of Alt+7)
+    key <AB06> { [ n, N, VoidSymbol, rightsinglequotemark ] };    // was Alt+n = } (dup of Alt+ö)
+    key <AB10> { [ minus, underscore, VoidSymbol, dead_abovedot ] }; // was Alt+- = * (dup of Alt+Shift+,)
+    key <AB02> { [ x, X, guillemotright, VoidSymbol ] };          // Alt+x = »; Alt+Shift+x dup > removed (LSGT owns </>)
+    key <AC10> { [ eacute, Eacute, VoidSymbol, cent ] };          // was Alt+é = $ (dup of Alt+Shift+4)
+
+    // Alt+y / Alt+x = double angle quotes («/»), per user request ("dupla nyíl")
+    key <AB01> { [ y, Y, guillemotleft, VoidSymbol ] };           // Alt+y = «; Alt+Shift+y dup < removed (LSGT owns </>)
+
+    // Remove duplicate < from M/Alt -- LSGT is now the sole home of </>
+    key <AB07> { [ m, M, VoidSymbol, masculine ] };
+
+    // Fill remaining empty (VoidSymbol) slots with practical dev/typing symbols
+    key <AC04> { [ f, F, function, ordfeminine ] };               // Alt+f = ƒ (function symbol)
+    key <AB03> { [ c, C, copyright, Ccedilla ] };                 // Alt+c = ©; Alt+Shift+c = Ç
+    key <AB04> { [ v, V, radical, singlelowquotemark ] };         // Alt+v = √
+    key <AB05> { [ b, B, approxeq, leftsinglequotemark ] };       // Alt+b = ≈
+    key <AB06> { [ n, N, notequal, rightsinglequotemark ] };      // Alt+n = ≠
+    key <AB10> { [ minus, underscore, emdash, dead_abovedot ] };  // Alt+- = — (em-dash)
+    key <AD01> { [ q, Q, at, trademark ] };                       // Alt+Shift+q = ™
+};
