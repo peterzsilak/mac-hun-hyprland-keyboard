@@ -28,6 +28,13 @@ macOS's Option key, instead of only the right one.
   source via `gsettings`, enables `lv3:alt_switch`, swaps Ctrl<->Super
   (Cmd) so Mac shortcuts (Cmd+C/V/...) land on the key GNOME treats as
   Ctrl, and registers the Ctrl+Alt+E -> € custom keybinding.
+- `gnome/apply-mac-finder-shortcuts.sh` -- adds the rest of the macOS
+  Finder hotkey set (see [support.apple.com/en-us/102650](https://support.apple.com/en-us/102650))
+  that doesn't already come for free from the Ctrl/Cmd swap: folder
+  shortcuts, Empty Trash, and Mission-Control-ish window switching. See
+  the mapping table below for what's automatic vs. custom vs. skipped.
+- `gnome/lib-custom-keybinding.sh` -- shared helper used by the two
+  scripts above to register GNOME custom keybindings.
 - `install.sh` -- installs the xkb variant (with automatic backup of the
   original `hu` symbols file), asks whether you're on Hyprland or GNOME
   (or pass `--de=hyprland`/`--de=gnome`), and prints/applies the
@@ -56,11 +63,54 @@ user** (not root/sudo), then log out/in:
 
 ```sh
 ./gnome/apply-gnome-settings.sh
+./gnome/apply-mac-finder-shortcuts.sh
 ```
 
 This swaps Ctrl and Super (Cmd) system-wide, matching the Mac's physical
 key layout muscle memory, in addition to enabling the Option-key symbol
-layer and the € shortcut.
+layer, the € shortcut, and the macOS Finder hotkey set below.
+
+## macOS Finder shortcut mapping (GNOME)
+
+Reference: [support.apple.com/en-us/102650](https://support.apple.com/en-us/102650).
+Legend: ✅ automatic (works once Ctrl/Cmd are swapped, because Nautilus
+already uses the same Ctrl+letter as Finder uses Cmd+letter), 🔧 custom
+keybinding added by `apply-mac-finder-shortcuts.sh`, ⚠️ no sane Linux
+equivalent -- intentionally skipped.
+
+| macOS shortcut | Meaning | Linux/GNOME |
+|---|---|---|
+| Cmd-D | Duplicate | ✅ Nautilus `Ctrl-D` |
+| Cmd-F | Search | ✅ Nautilus `Ctrl-F` |
+| Cmd-R | Refresh/original | ✅ `Ctrl-R` |
+| Cmd-N | New window | ✅ Nautilus `Ctrl-N` |
+| Cmd-T | New tab | ✅ Nautilus `Ctrl-T` |
+| Cmd-1 / Cmd-2 | Icon / list view | ✅ Nautilus `Ctrl-1` / `Ctrl-2` |
+| Cmd-3 / Cmd-4 | Columns / gallery view | ⚠️ not in modern GTK4 Nautilus |
+| Cmd-[ / Cmd-] | Back / forward folder | ✅ Nautilus `Ctrl-[` / `Ctrl-]` |
+| Cmd-Up | Open parent folder | ✅ Nautilus `Ctrl-Up` |
+| Cmd-Down | Open selected item | ✅ Nautilus `Ctrl-Down`/`Ctrl-O` |
+| Cmd-Delete | Move to Trash | ✅ plain `Delete` already trashes in Nautilus |
+| Shift-Cmd-N | New folder | ✅ Nautilus `Ctrl-Shift-N` |
+| Shift-Cmd-H | Home folder | 🔧 `Shift-Ctrl-H` opens `nautilus $HOME` |
+| Shift-Cmd-D | Desktop folder | 🔧 `Shift-Ctrl-D` opens `~/Desktop` |
+| Shift-Cmd-O | Documents folder | 🔧 `Shift-Ctrl-O` opens `~/Documents` |
+| Option-Cmd-L | Downloads folder | 🔧 `Alt-Ctrl-L` opens `~/Downloads` |
+| Shift-Cmd-C | Computer window | 🔧 `Shift-Ctrl-C` opens `computer:///` |
+| Shift-Cmd-K | Network window | 🔧 `Shift-Ctrl-K` opens `network:///` |
+| Shift-Cmd-F | Recents window | 🔧 `Shift-Ctrl-F` opens `recent:///` |
+| Shift-Cmd-Delete | Empty Trash | 🔧 `Shift-Ctrl-Delete` runs `gio trash --empty` |
+| Option-Shift-Cmd-Delete | Empty Trash, no confirm | 🔧 same binding (CLI has no confirm dialog) |
+| Shift-Cmd-G | Go to Folder dialog | ✅ Nautilus `Ctrl-L` (location bar) covers this |
+| Cmd-K | Connect to Server | ✅ Nautilus `Ctrl-L`, type `smb://`/`ssh://`/etc. |
+| Cmd-Y / Option-Cmd-Y | Quick Look / slideshow | ✅ `Space` via the `gnome-sushi` package |
+| Control-Space | Switch input source | ✅ becomes `Super-Space` after the swap, GNOME's default |
+| Control-Up Arrow | Mission Control | 🔧 `Ctrl-Up` -> Activities overview |
+| Control-Down Arrow | Show all windows of front app | 🔧 `Ctrl-Down` -> cycle windows of current app |
+| Shift-Cmd-I, Shift-Cmd-R (AirDrop/iCloud), Shift-Cmd-U (Utilities), Shift-Cmd-P/T (preview/tab bar toggle), Control-Cmd-A (alias), Control-Cmd-T (sidebar), Option-Cmd-D (Dock toggle), Option-Cmd-P/S (path/sidebar toggle), Cmd-J (view options), Cmd-/ (status bar) | Finder-only UI toggles / macOS-only features | ⚠️ no equivalent GNOME/Nautilus feature |
+| Fn-A/C/D/N, Fn-Shift-A (Dock, Control Center, Dictation, Notification Center, Launchpad) | Fn-row shortcuts | ⚠️ Fn behavior is Apple-firmware-specific, not portable via xkb |
+| Option/Cmd-drag, Option-double-click | Mouse-modifier behaviors | ⚠️ different modifier convention on GNOME (`Ctrl`-drag = copy already, unrelated to this swap) |
+| Brightness/Volume + Option/Control combos | Open related Settings panel / fine adjustment | ⚠️ hardware/media-key dependent, out of scope |
 
 ## Symbol reference (current layout)
 

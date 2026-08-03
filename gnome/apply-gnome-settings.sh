@@ -14,6 +14,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=./lib-custom-keybinding.sh
+source "$SCRIPT_DIR/lib-custom-keybinding.sh"
+
 if [[ $EUID -eq 0 ]]; then
     echo "Run this as your normal desktop user, not root/sudo." >&2
     exit 1
@@ -33,29 +37,16 @@ gsettings set org.gnome.desktop.input-sources xkb-options \
     "['lv3:alt_switch', 'ctrl:swap_lwin_lctl', 'ctrl:swap_rwin_rctl']"
 
 echo "Registering Ctrl+Alt+E -> € custom keybinding..."
-KB_BASE="org.gnome.settings-daemon.plugins.media-keys"
-KB_PATH="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom-mac-euro/"
-
-existing=$(gsettings get "$KB_BASE" custom-keybindings)
-if [[ "$existing" != *"custom-mac-euro"* ]]; then
-    if [[ "$existing" == "@as []" || "$existing" == "[]" ]]; then
-        new_list="['$KB_PATH']"
-    else
-        new_list="${existing%]}, '$KB_PATH']"
-    fi
-    gsettings set "$KB_BASE" custom-keybindings "$new_list"
-fi
-
 if [[ "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
     TYPE_CMD="wtype €"
 else
     TYPE_CMD="xdotool key U20AC"
 fi
-
-gsettings set "${KB_BASE}.custom-keybinding:${KB_PATH}" name "Mac euro sign"
-gsettings set "${KB_BASE}.custom-keybinding:${KB_PATH}" command "$TYPE_CMD"
-gsettings set "${KB_BASE}.custom-keybinding:${KB_PATH}" binding "<Ctrl><Alt>e"
+register_custom_keybinding "mac-euro" "Mac euro sign" "$TYPE_CMD" "<Ctrl><Alt>e"
 
 echo ""
 echo "Done. You may need to log out/in (or restart gnome-shell with"
 echo "Alt+F2, r on X11) for the input source change to fully apply."
+echo ""
+echo "Run ./apply-mac-finder-shortcuts.sh next for the full macOS Finder"
+echo "hotkey set (folder shortcuts, Mission Control equivalent, etc.)."
