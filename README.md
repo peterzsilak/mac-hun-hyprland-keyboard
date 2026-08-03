@@ -1,10 +1,12 @@
-# Mac Hungarian keyboard layout for Hyprland / Arch Linux
+# Mac Hungarian keyboard layout for Hyprland / GNOME on Arch Linux
 
 A custom `hu` xkb keyboard variant, `102_qwertz_comma_dead_mac_full`, that
 replicates the macOS Hungarian (Apple Aluminium ISO) keyboard's native
-Option-key symbol placement on Linux/Hyprland/Wayland, with a few
-deliberate deviations (see below) to remove duplicate symbol positions and
-fill previously-empty Option slots with useful dev/typing characters.
+Option-key symbol placement on Linux, with a few deliberate deviations
+(see below) to remove duplicate symbol positions and fill
+previously-empty Option slots with useful dev/typing characters.
+Supports both **Hyprland** and **GNOME** (X11 or Wayland), selectable at
+install time.
 
 Built on top of the existing `hu(102_qwertz_comma_dead_mac)` xkb variant
 (already shipped with X.Org's `xkeyboard-config` package), with `Alt`
@@ -22,19 +24,43 @@ macOS's Option key, instead of only the right one.
 - `hypr/keybinds-snippet.lua` -- an extra Ctrl+Alt+E -> € keybind (via
   `wtype`), matching macOS's Alt+E shortcut for the Euro sign (in addition
   to the native Alt+U bonus mapping baked into the layout itself).
+- `gnome/apply-gnome-settings.sh` -- GNOME counterpart: sets the input
+  source via `gsettings`, enables `lv3:alt_switch`, swaps Ctrl<->Super
+  (Cmd) so Mac shortcuts (Cmd+C/V/...) land on the key GNOME treats as
+  Ctrl, and registers the Ctrl+Alt+E -> € custom keybinding.
 - `install.sh` -- installs the xkb variant (with automatic backup of the
-  original `hu` symbols file) and prints the remaining manual steps.
+  original `hu` symbols file), asks whether you're on Hyprland or GNOME
+  (or pass `--de=hyprland`/`--de=gnome`), and prints/applies the
+  remaining steps.
 
 ## Installation
 
 ```sh
 git clone <this-repo>
 cd mac-hun-hyprland-keyboard
-sudo ./install.sh
+sudo ./install.sh            # prompts for Hyprland or GNOME
+# or non-interactively:
+sudo ./install.sh --de=gnome
+sudo ./install.sh --de=hyprland
 ```
 
-Then follow the printed instructions to update your Hyprland config and
-reload.
+### Hyprland
+
+Follow the printed instructions to update `hypr/input.lua` /
+`hypr/keybinds-snippet.lua` in your own config and run `hyprctl reload`.
+
+### GNOME
+
+After `install.sh` finishes, run the following as your **normal desktop
+user** (not root/sudo), then log out/in:
+
+```sh
+./gnome/apply-gnome-settings.sh
+```
+
+This swaps Ctrl and Super (Cmd) system-wide, matching the Mac's physical
+key layout muscle memory, in addition to enabling the Option-key symbol
+layer and the € shortcut.
 
 ## Symbol reference (current layout)
 
