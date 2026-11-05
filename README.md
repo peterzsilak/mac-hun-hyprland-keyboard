@@ -84,6 +84,13 @@ Command/Ctrl-izommemóriához, és regisztrálja a `Ctrl+Alt+E` → `€`
 gyorsbillentyűt. Ez a felhasználó GNOME-beállításait módosítja, nem a
 rendszer többi felhasználójáét.
 
+Ha a `keyd` már a bal Command (`leftmeta`) billentyűt Controlként kezeli,
+futtasd így, hogy a GNOME ne cserélje fel még egyszer ugyanezt a billentyűt:
+
+```sh
+MAC_KEYBOARD_KEYD_LEFTMETA_CONTROL=1 ./gnome/apply-gnome-settings.sh
+```
+
 ### 5. A GNOME újraindítása
 
 Jelentkezz ki **teljesen** a GNOME-munkamenetből, majd jelentkezz vissza.
@@ -231,6 +238,20 @@ normál felhasználóként futtasd újra:
 ```sh
 ./gnome/apply-gnome-settings.sh
 ```
+
+### A bal Command+W nem zárja be a böngészőlapot
+
+Ha a `keyd` már Controlra képezi le a bal Command billentyűt, a GNOME
+`ctrl:swap_lwin_lctl` beállítása ezt visszacseréli Superre. Alkalmazd a
+keyd-kompatibilis beállítást:
+
+```sh
+MAC_KEYBOARD_KEYD_LEFTMETA_CONTROL=1 ./gnome/apply-gnome-settings.sh
+```
+
+Ezután a GNOME bal Command-billentyűje Controlként jut el az
+alkalmazásokhoz, így például a böngészőben a Command+W bezárja az aktuális
+lapot.
 
 ## Mit telepít a projekt?
 

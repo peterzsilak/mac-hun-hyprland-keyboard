@@ -80,6 +80,13 @@ Ctrl and Super for Mac Command/Ctrl muscle memory, and registers the
 `Ctrl+Alt+E` → `€` shortcut. It changes the GNOME settings for this user,
 not for other users on the system.
 
+If `keyd` already maps the left Command (`leftmeta`) key to Control, run
+the script this way to prevent GNOME from swapping that key a second time:
+
+```sh
+MAC_KEYBOARD_KEYD_LEFTMETA_CONTROL=1 ./gnome/apply-gnome-settings.sh
+```
+
 ### 5. Restart your GNOME session
 
 Log **all the way out** of GNOME, then log back in. Locking the screen or
@@ -224,6 +231,19 @@ user:
 ```sh
 ./gnome/apply-gnome-settings.sh
 ```
+
+### Left Command+W does not close the browser tab
+
+If `keyd` already maps the left Command key to Control, GNOME's
+`ctrl:swap_lwin_lctl` option swaps it back to Super. Apply the keyd-aware
+settings instead:
+
+```sh
+MAC_KEYBOARD_KEYD_LEFTMETA_CONTROL=1 ./gnome/apply-gnome-settings.sh
+```
+
+GNOME will then pass the left Command key through to applications as
+Control, so Command+W closes the current browser tab.
 
 ## What the project installs
 

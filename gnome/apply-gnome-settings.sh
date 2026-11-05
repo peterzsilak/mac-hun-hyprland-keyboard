@@ -33,8 +33,13 @@ gsettings set org.gnome.desktop.input-sources sources \
     "[('xkb', 'hu+102_qwertz_comma_dead_mac_full')]"
 
 echo "Setting xkb-options (lv3:alt_switch + Ctrl/Super swap)..."
-gsettings set org.gnome.desktop.input-sources xkb-options \
-    "['lv3:alt_switch', 'ctrl:swap_lwin_lctl', 'ctrl:swap_rwin_rctl']"
+if [[ "${MAC_KEYBOARD_KEYD_LEFTMETA_CONTROL:-0}" == "1" ]]; then
+    echo "keyd already maps left Command to Control; avoiding a second left-side swap."
+    XKB_OPTIONS="['lv3:alt_switch', 'ctrl:swap_rwin_rctl']"
+else
+    XKB_OPTIONS="['lv3:alt_switch', 'ctrl:swap_lwin_lctl', 'ctrl:swap_rwin_rctl']"
+fi
+gsettings set org.gnome.desktop.input-sources xkb-options "$XKB_OPTIONS"
 
 echo "Registering Ctrl+Alt+E -> € custom keybinding..."
 if [[ "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
