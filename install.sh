@@ -9,8 +9,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 XKB_HU_FILE="/usr/share/X11/xkb/symbols/hu"
+XKB_RULES_FILES=(
+    "/usr/share/X11/xkb/rules/evdev.xml"
+    "/usr/share/X11/xkb/rules/base.xml"
+)
 BLOCK_FILE="$SCRIPT_DIR/xkb/hu-symbols-custom-block.txt"
 MARKER='xkb_symbols "102_qwertz_comma_dead_mac_full"'
+VARIANT="102_qwertz_comma_dead_mac_full"
+RULE_ENTRY='        <variant>
+          <configItem>
+            <name>102_qwertz_comma_dead_mac_full</name>
+            <description>Hungarian (macOS-compatible, Apple Aluminium)</description>
+          </configItem>
+        </variant>'
 
 DE=""
 for arg in "$@"; do
@@ -51,6 +62,39 @@ else
     cat "$tmp_file" > "$XKB_HU_FILE"
     echo "Installed/updated custom variant in $XKB_HU_FILE"
 fi
+
+for rules_file in "${XKB_RULES_FILES[@]}"; do
+    rules_tmp="$(mktemp "${rules_file}.tmp.XXXXXX")"
+    if ! awk -v variant="$VARIANT" -v entry="$RULE_ENTRY" '
+        /<layout>/ { in_layout = 1; is_hu = 0 }
+        in_layout && /<name>hu<\/name>/ { is_hu = 1 }
+        is_hu && index($0, "<name>" variant "</name>") { found = 1 }
+        is_hu && /<\/variantList>/ && !found {
+            print entry
+            found = 1
+        }
+        { print }
+        /<\/layout>/ { in_layout = 0; is_hu = 0 }
+        END { if (!found) exit 1 }
+    ' "$rules_file" > "$rules_tmp"; then
+        rm -f "$rules_tmp"
+        echo "Could not register $VARIANT in $rules_file" >&2
+        exit 1
+    fi
+
+    if cmp -s "$rules_file" "$rules_tmp"; then
+        echo "Custom variant is registered in $rules_file."
+        rm -f "$rules_tmp"
+    else
+        backup="${rules_file}.bak.$(date +%Y%m%d%H%M%S)"
+        echo "Backing up $rules_file to $backup"
+        cp "$rules_file" "$backup"
+        chmod --reference="$rules_file" "$rules_tmp"
+        chown --reference="$rules_file" "$rules_tmp"
+        mv "$rules_tmp" "$rules_file"
+        echo "Registered custom variant in $rules_file"
+    fi
+done
 
 if [[ -z "$DE" ]]; then
     echo ""

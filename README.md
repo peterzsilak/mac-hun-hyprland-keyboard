@@ -17,8 +17,9 @@ macOS's Option key, instead of only the right one.
 ## What's included
 
 - `xkb/hu-symbols-custom-block.txt` -- the `xkb_symbols
-  "102_qwertz_comma_dead_mac_full"` block to append to
-  `/usr/share/X11/xkb/symbols/hu`.
+  "102_qwertz_comma_dead_mac_full"` block to install in
+  `/usr/share/X11/xkb/symbols/hu`. The installer also registers the
+  variant in XKB's `evdev.xml` and `base.xml` rules so GNOME can load it.
 - `hypr/input.lua` -- example Hyprland Lua input config enabling the
   layout.
 - `hypr/keybinds-snippet.lua` -- an extra Ctrl+Alt+E -> € keybind (via
