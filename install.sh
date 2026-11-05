@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs the custom "Hungarian (macOS-compatible, Apple Aluminium)" xkb
+# Installs the custom documented macOS Hungarian XKB variant
 # keyboard layout on Arch Linux, and points to the Hyprland or GNOME
 # config needed to activate it (selectable at install time).
 #
@@ -16,10 +16,11 @@ XKB_RULES_FILES=(
 BLOCK_FILE="$SCRIPT_DIR/xkb/hu-symbols-custom-block.txt"
 MARKER='xkb_symbols "102_qwertz_comma_dead_mac_full"'
 VARIANT="102_qwertz_comma_dead_mac_full"
+RULE_DESCRIPTION="Hungarian (macOS, Apple ISO)"
 RULE_ENTRY='        <variant>
           <configItem>
             <name>102_qwertz_comma_dead_mac_full</name>
-            <description>Hungarian (macOS-compatible, Apple Aluminium)</description>
+            <description>Hungarian (macOS, Apple ISO)</description>
           </configItem>
         </variant>'
 
@@ -65,15 +66,23 @@ fi
 
 for rules_file in "${XKB_RULES_FILES[@]}"; do
     rules_tmp="$(mktemp "${rules_file}.tmp.XXXXXX")"
-    if ! awk -v variant="$VARIANT" -v entry="$RULE_ENTRY" '
+    if ! awk -v variant="$VARIANT" -v description="$RULE_DESCRIPTION" -v entry="$RULE_ENTRY" '
         /<layout>/ { in_layout = 1; is_hu = 0 }
         in_layout && /<name>hu<\/name>/ { is_hu = 1 }
-        is_hu && index($0, "<name>" variant "</name>") { found = 1 }
+        is_hu && /<variant>/ { in_variant = 1; is_target = 0 }
+        is_hu && in_variant && index($0, "<name>" variant "</name>") {
+            found = 1
+            is_target = 1
+        }
+        is_hu && in_variant && is_target && /<description>/ {
+            sub(/<description>[^<]*<\/description>/, "<description>" description "</description>")
+        }
         is_hu && /<\/variantList>/ && !found {
             print entry
             found = 1
         }
         { print }
+        is_hu && /<\/variant>/ { in_variant = 0; is_target = 0 }
         /<\/layout>/ { in_layout = 0; is_hu = 0 }
         END { if (!found) exit 1 }
     ' "$rules_file" > "$rules_tmp"; then

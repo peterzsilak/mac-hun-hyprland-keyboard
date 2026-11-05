@@ -29,9 +29,9 @@ használni szeretnéd.
 - `libxkbcommon` az `xkbcli` ellenőrző parancsokhoz (a GNOME általában
   már telepíti).
 - Git a projekt letöltéséhez.
-- Az eurójelhez tartozó opcionális `Ctrl+Alt+E` gyorsbillentyűhöz:
+- Az eurójelhez tartozó `Ctrl+Alt+E` gyorsbillentyűhöz:
   `wtype` Wayland-munkamenetben vagy `xdotool` X11-munkamenetben.
-  Ezek nélkül is beírható az eurójel az `Alt+U` kombinációval.
+  Ez a dokumentált macOS-kombinációt valósítja meg GNOME-ban.
 
 Friss Arch rendszeren:
 
@@ -92,8 +92,9 @@ nem szükséges. A munkamenet újraindítása után teszteld a billentyűket.
 
 ### 6. Gyors ellenőrzés
 
-Az `Alt+Q` kombinációnak `@` jelet, az `Alt+U` kombinációnak `€` jelet
-kell adnia. Az ékezetes magyar betűk a fizikai magyar Apple-billentyűzet
+Az `Alt+Q` kombinációnak `@` jelet, az `Alt+U` kombinációnak halott
+diaerézist (`¨`), a `Ctrl+Alt+E` kombinációnak pedig `€` jelet kell adnia.
+Az ékezetes magyar betűk a fizikai magyar Apple-billentyűzet
 alapbillentyűin maradnak; például az `é`, `á`, `ű` és `ő` billentyűk
 Alt nélkül működnek.
 
@@ -109,7 +110,7 @@ xkbcli list | grep -A 5 '102_qwertz_comma_dead_mac_full'
 A forrásnak ezt kell tartalmaznia:
 `('xkb', 'hu+102_qwertz_comma_dead_mac_full')`; az `xkb-options` listában
 pedig szerepelnie kell az `lv3:alt_switch` opciónak. Az `xkbcli list`
-kimenetében a `Hungarian (macOS-compatible, Apple Aluminium)` leírás
+kimenetében a `Hungarian (macOS documented symbols, Apple ISO)` leírás
 jelenjen meg. Az `xkbcli` a `libxkbcommon` csomag része.
 
 ## GNOME Finder-gyorsbillentyűk (opcionális)
@@ -181,8 +182,8 @@ hyprctl reload
 A `hypr/input.lua` egy Lua-alapú Hyprland konfigurációs keretrendszerhez
 készült példa, nem másolható közvetlenül minden Hyprland-konfigurációba.
 A projekt `hypr/keybinds-snippet.lua` fájlja opcionális `Ctrl+Alt+E` → `€`
-gyorsbillentyűt mutat be ugyanahhoz a Lua keretrendszerhez. Az eurójel az
-alapkiosztásban az `Alt+U` kombinációval enélkül is elérhető.
+gyorsbillentyűt mutat be ugyanahhoz a Lua keretrendszerhez. Ehhez a
+gyorsbillentyűhöz Wayland alatt `wtype` szükséges.
 
 ## Frissítés és hibaelhárítás
 
@@ -223,10 +224,9 @@ Ezután jelentkezz ki és vissza.
 
 ### A `Ctrl+Alt+E` nem ír eurójelet
 
-Az `Alt+U` → `€` kiosztás része, ezért ezt használd kerülő megoldásként.
-A külön gyorsbillentyű Wayland alatt `wtype`, X11 alatt `xdotool` programot
-igényel. Telepítsd a munkamenetednek megfelelő csomagot, majd normál
-felhasználóként futtasd újra:
+A `Ctrl+Alt+E` gyorsbillentyű Wayland alatt `wtype`, X11 alatt `xdotool`
+programot igényel. Telepítsd a munkamenetednek megfelelő csomagot, majd
+normál felhasználóként futtasd újra:
 
 ```sh
 ./gnome/apply-gnome-settings.sh
@@ -247,95 +247,64 @@ felhasználóként futtasd újra:
 - `hypr/keybinds-snippet.lua` – opcionális eurójel-gyorsbillentyű ugyanahhoz
   a Lua-konfigurációhoz.
 
-## Kiosztás
+## Dokumentált macOS-kombinációk
 
-A táblázatok sorrendje: **alap / Shift / Alt / Alt+Shift**. A „–” üres
-billentyűszintet (`VoidSymbol`) jelöl. Az Alt a macOS Option billentyűjének
+Az alábbi táblázat a nyilvánosan dokumentált Apple magyar kiosztás
+karaktereit sorolja fel. A fizikai billentyűnevek a numerikus blokkos
+magyar ISO Apple billentyűzetet követik. Az Alt az Option billentyűnek
 felel meg.
 
-### Számsor
+Az Apple `MQ052MG/A` cikkszám a régebbi magyar, numerikus blokkos Magic
+Keyboard hardverváltozatát azonosítja; nem tartalmazza a macOS
+karakterrétegeinek térképét.
 
-| Billentyű | Alap | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| § | 0 | § | ¬ | ¬ |
-| 1 | 1 | ' | & | ~(halott) |
-| 2 | 2 | " | ˇ(halott) | ˇ |
-| 3 | 3 | + | ^(halott) | # |
-| 4 | 4 | ! | ˘(halott) | $ |
-| 5 | 5 | % | ˚(halott) | ° |
-| 6 | 6 | / | ˛(halott) | ˛ |
-| 7 | 7 | = | { | `(halott) |
-| 8 | 8 | ( | [ | ˙ |
-| 9 | 9 | ) | ] | ´ |
-| Ö | ö | Ö | } | ˝ |
-| Ü | ü | Ü | \ | ¨ |
-| Ó | ó | Ó | ¸(halott) | ¸ |
+| macOS-kombináció | Karakter |
+|---|---|
+| Alt+í | `|` |
+| Alt+ü | `\` |
+| Alt+Shift+3 | `#` |
+| Alt+Shift+4 | `$` |
+| Alt+q | `@` |
+| Ctrl+Alt+E | `€` (GNOME-gyorsbillentyű) |
+| Alt+g | `©` |
+| Alt+1 | `&` |
+| Alt+. | `;` |
+| Alt+Shift+, | `*` |
+| Alt+8 / Alt+9 | `[` / `]` |
+| Alt+7 / Alt+ö | `{` / `}` |
+| Alt+Shift+Y / Alt+Shift+X | `<` / `>` |
+| Alt+ú / Alt+ű | `~` / `` ` `` |
 
-### Felső betűsor
+Ez nem teljes, hiteles Apple-billentyűszintű térkép. A projekt
+alapértelmezett XKB magyar kiosztásából származó, nem felsorolt
+karakterek és módosítószintek eltérhetnek az Apple kiosztásától. A
+teljes, 100%-os egyezéshez az Apple Keyboard Viewer minden módosítós
+rétegének (alap, Shift, Option, Shift+Option) ellenőrzése szükséges.
+Ezért a projekt nem állítja, hogy a teljes macOS-kiosztás bitpontos
+másolata.
 
-| Billentyű | Alap | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| Q | q | Q | @ | ™ |
-| W | w | W | \| | § |
-| E | e | E | Ä | E |
-| R | r | R | ¶ | ® |
-| T | t | T | ŧ | Ŧ |
-| Z | z | Z | – | ¥ |
-| U | u | U | € | ↑ |
-| I | i | I | Í | í |
-| O | o | O | „ | Ø |
-| P | p | P | " | Þ |
-| Ő | ő | Ő | ÷ | ˝(halott) |
-| Ú | ú | Ú | ~ | ¯(halott) |
+Az `Alt+u` jelenleg halott diaerézis billentyű (`¨`), az általános macOS
+viselkedés alapján; ezt a magyar Apple-kiosztásban nem sikerült külön
+forrással ellenőrizni.
 
-### Középső betűsor
+### További négyrétegű magyar billentyűtérkép
 
-| Billentyű | Alap | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| A | a | A | ä | Ä |
-| S | s | S | đ | ẞ |
-| D | d | D | Đ | Ð |
-| F | f | F | ƒ | ª |
-| G | g | G | © | Ŋ |
-| H | h | H | ħ | Ħ |
-| J | j | J | í | Í |
-| K | k | K | ł | – |
-| L | l | L | Ł | Ł |
-| É | é | É | – | ¢ |
-| Á | á | Á | ß | ẞ |
-| Ű | ű | Ű | ` | ˘(halott) |
-
-### Alsó betűsor
-
-| Billentyű | Alap | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| Í (ISO-billentyű) | í | Í | < | > |
-| Y | y | Y | « | – |
-| X | x | X | » | – |
-| C | c | C | © | Ç |
-| V | v | V | √ | ‚ |
-| B | b | B | ≈ | ' |
-| N | n | N | ≠ | ' |
-| M | m | M | – | º |
-| , | , | ? | ; | * |
-| . | . | : | … | ÷ |
-| - | - | _ | — | ˙(halott) |
-
-## Eltérések a macOS magyar kiosztásától
-
-- A `<` és `>` kizárólag a bal Shift melletti ISO-billentyűn található,
-  nem ismétlődik az M, Y és X billentyűkön.
-- Az `Alt+Y` és `Alt+X` « és » jelet ad.
-- Az `Alt+.` ellipszist (`…`) ad.
-- A macOS kiosztásban üres Option-helyek egy része hasznos karaktert kapott:
-  `ƒ`, `©`/`Ç`, `√`, `≈`, `≠`, `—` és `™`.
-- Az `Alt+ú` tilde (`~`), az `Alt+ű` backtick (`` ` ``), programozási
-  kényelmi okból.
+[A Magic Utilities magyar kiosztásábrája](https://magicutilities.net/magic-keyboard/help/keyboard-layouts/layout-mu?layout=Hungarian)
+ugyanazon magyar ISO billentyűfeliratokhoz mutat alap, Shift, jobb Alt
+(AltGr) és Shift+jobb Alt karaktereket. Ez **Windows/AltGr-kiosztás**,
+nem Apple macOS-kiosztás: például az eurójelet AltGr+U-val mutatja,
+míg a fenti macOS gyorsbillentyű Ctrl+Alt+E. Referenciaként hasznos a
+fizikai billentyűk és a Windows-réteg összevetéséhez, de nem használjuk
+az Apple Option-réteg bizonyítékaként.
 
 ## Források
 
 - A szimbólumok alapja a macOS magyar kiosztása, összevetve ezzel:
   https://randomblog.hu/hungarian-macos-keyboard-guide-to-newbies/
+- További Mac HU karakterkombinációk:
+  https://github.com/leventemo/lvnt/blob/main/src/data/blog/_2023/keyboard-layouts.md
+- Négyrétegű magyar ISO Windows/AltGr-kiosztás (nem macOS):
+  https://magicutilities.net/magic-keyboard/help/keyboard-layouts/layout-mu?layout=Hungarian
 - További, PC-s kiosztásokról szóló projektek:
   https://github.com/gaborbata/mac-hun-keyboard és
   https://github.com/zaki/mac-hun-keyboard

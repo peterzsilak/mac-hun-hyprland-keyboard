@@ -26,9 +26,9 @@ Run these steps on the machine where you want to use the layout.
 - `libxkbcommon` for the `xkbcli` verification commands (GNOME usually
   already installs it).
 - Git to download this project.
-- For the optional `Ctrl+Alt+E` euro shortcut: `wtype` on a Wayland
-  session or `xdotool` on an X11 session. The euro sign is also available
-  with `Alt+U` without either program.
+- For the `Ctrl+Alt+E` euro shortcut: `wtype` on a Wayland session or
+  `xdotool` on an X11 session. This implements the documented macOS
+  combination in GNOME.
 
 On a fresh Arch installation:
 
@@ -88,9 +88,10 @@ computer. Test the keys after logging in again.
 
 ### 6. Quick check
 
-`Alt+Q` should type `@`, and `Alt+U` should type `€`. Hungarian accented
-letters remain on the base keys of the physical Hungarian Apple keyboard;
-for example, `é`, `á`, `ű`, and `ő` work without Alt.
+`Alt+Q` should type `@`, `Alt+U` should produce a dead diaeresis (`¨`),
+and `Ctrl+Alt+E` should type `€`. Hungarian accented letters remain on
+the base keys of the physical Hungarian Apple keyboard; for example,
+`é`, `á`, `ű`, and `ő` work without Alt.
 
 You can also check the saved GNOME source and the XKB catalog entry:
 
@@ -104,7 +105,7 @@ xkbcli list | grep -A 5 '102_qwertz_comma_dead_mac_full'
 The source should contain
 `('xkb', 'hu+102_qwertz_comma_dead_mac_full')`; the `xkb-options` list
 should include `lv3:alt_switch`. The `xkbcli list` output should show
-`Hungarian (macOS-compatible, Apple Aluminium)`. `xkbcli` is included in
+`Hungarian (macOS documented symbols, Apple ISO)`. `xkbcli` is included in
 the `libxkbcommon` package.
 
 ## GNOME Finder shortcuts (optional)
@@ -174,8 +175,8 @@ hyprctl reload
 `hypr/input.lua` is an example for a Lua-based Hyprland configuration
 framework; it cannot be copied directly into every Hyprland setup. The
 project's `hypr/keybinds-snippet.lua` shows an optional
-`Ctrl+Alt+E` → `€` shortcut for that same Lua framework. The layout
-provides `€` with `Alt+U` regardless.
+`Ctrl+Alt+E` → `€` shortcut for that same Lua framework. The shortcut requires `wtype` on
+Wayland.
 
 ## Updating and troubleshooting
 
@@ -216,9 +217,9 @@ in.
 
 ### `Ctrl+Alt+E` does not type the euro sign
 
-Use `Alt+U` → `€`, which is part of the layout. The extra shortcut
-requires `wtype` on Wayland or `xdotool` on X11. Install the package for
-your session, then rerun this as your regular user:
+The `Ctrl+Alt+E` shortcut requires `wtype` on Wayland or `xdotool` on
+X11. Install the package for your session, then rerun this as your regular
+user:
 
 ```sh
 ./gnome/apply-gnome-settings.sh
@@ -239,95 +240,63 @@ your session, then rerun this as your regular user:
 - `hypr/keybinds-snippet.lua` — optional euro shortcut for the same Lua
   configuration.
 
-## Layout reference
+## Documented macOS combinations
 
-The columns are **base / Shift / Alt / Alt+Shift**. “—” means an empty
-(`VoidSymbol`) level. Alt corresponds to the macOS Option key.
+The table below lists characters documented for the Apple Hungarian
+layout. Physical key names match the Hungarian ISO Apple keyboard with a
+numeric keypad. Alt corresponds to the macOS Option key.
 
-### Number row
+Apple part number `MQ052MG/A` identifies the older Hungarian Magic
+Keyboard hardware variant with a numeric keypad; it does not contain the
+macOS character-layer map.
 
-| Key | Base | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| § | 0 | § | ¬ | ¬ |
-| 1 | 1 | ' | & | ~(dead) |
-| 2 | 2 | " | ˇ(dead) | ˇ |
-| 3 | 3 | + | ^(dead) | # |
-| 4 | 4 | ! | ˘(dead) | $ |
-| 5 | 5 | % | ˚(dead) | ° |
-| 6 | 6 | / | ˛(dead) | ˛ |
-| 7 | 7 | = | { | `(dead) |
-| 8 | 8 | ( | [ | ˙ |
-| 9 | 9 | ) | ] | ´ |
-| Ö | ö | Ö | } | ˝ |
-| Ü | ü | Ü | \ | ¨ |
-| Ó | ó | Ó | ¸(dead) | ¸ |
+| macOS combination | Character |
+|---|---|
+| Alt+í | `|` |
+| Alt+ü | `\` |
+| Alt+Shift+3 | `#` |
+| Alt+Shift+4 | `$` |
+| Alt+q | `@` |
+| Ctrl+Alt+E | `€` (GNOME shortcut) |
+| Alt+g | `©` |
+| Alt+1 | `&` |
+| Alt+. | `;` |
+| Alt+Shift+, | `*` |
+| Alt+8 / Alt+9 | `[` / `]` |
+| Alt+7 / Alt+ö | `{` / `}` |
+| Alt+Shift+Y / Alt+Shift+X | `<` / `>` |
+| Alt+ú / Alt+ű | `~` / `` ` `` |
 
-### Top letter row
+This is not a complete, authoritative Apple key-by-key map. Characters
+and modifier levels not listed here come from the default XKB Hungarian
+layout and may differ from Apple's layout. A full, 100% match requires
+checking every modifier layer (base, Shift, Option, Shift+Option) in
+Apple's Keyboard Viewer. This project therefore does not claim to be a
+bit-for-bit copy of the complete macOS layout.
 
-| Key | Base | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| Q | q | Q | @ | ™ |
-| W | w | W | \| | § |
-| E | e | E | Ä | E |
-| R | r | R | ¶ | ® |
-| T | t | T | ŧ | Ŧ |
-| Z | z | Z | — | ¥ |
-| U | u | U | € | ↑ |
-| I | i | I | Í | í |
-| O | o | O | „ | Ø |
-| P | p | P | " | Þ |
-| Ő | ő | Ő | ÷ | ˝(dead) |
-| Ú | ú | Ú | ~ | ¯(dead) |
+`Alt+u` is currently set to a dead diaeresis (`¨`) based on general macOS
+behavior; this mapping could not be independently verified for Apple's
+Hungarian layout.
 
-### Home row
+### Additional four-level Hungarian keyboard chart
 
-| Key | Base | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| A | a | A | ä | Ä |
-| S | s | S | đ | ẞ |
-| D | d | D | Đ | Ð |
-| F | f | F | ƒ | ª |
-| G | g | G | © | Ŋ |
-| H | h | H | ħ | Ħ |
-| J | j | J | í | Í |
-| K | k | K | ł | — |
-| L | l | L | Ł | Ł |
-| É | é | É | — | ¢ |
-| Á | á | Á | ß | ẞ |
-| Ű | ű | Ű | ` | ˘(dead) |
-
-### Bottom row
-
-| Key | Base | Shift | Alt | Alt+Shift |
-|---|---|---|---|---|
-| Í (ISO key) | í | Í | < | > |
-| Y | y | Y | « | — |
-| X | x | X | » | — |
-| C | c | C | © | Ç |
-| V | v | V | √ | ‚ |
-| B | b | B | ≈ | ' |
-| N | n | N | ≠ | ' |
-| M | m | M | — | º |
-| , | , | ? | ; | * |
-| . | . | : | … | ÷ |
-| - | - | _ | — | ˙(dead) |
-
-## Differences from the stock macOS Hungarian layout
-
-- `<` and `>` are only on the ISO key next to left Shift; they are not
-  duplicated on M, Y, and X.
-- `Alt+Y` and `Alt+X` produce « and ».
-- `Alt+.` produces an ellipsis (`…`).
-- Some empty Option slots are filled with useful symbols:
-  `ƒ`, `©`/`Ç`, `√`, `≈`, `≠`, `—`, and `™`.
-- `Alt+ú` produces a tilde (`~`), and `Alt+ű` produces a backtick (`` ` ``)
-  for programming convenience.
+The [Magic Utilities Hungarian layout chart](https://magicutilities.net/magic-keyboard/help/keyboard-layouts/layout-mu?layout=Hungarian)
+shows base, Shift, right Alt (AltGr), and Shift+right Alt characters for
+the same Hungarian ISO key legends. This is a **Windows/AltGr layout**,
+not the Apple macOS layout: for example, it shows the euro sign on
+AltGr+U, while the macOS shortcut listed above is Ctrl+Alt+E. It is
+useful as a reference for the physical keys and Windows modifier layer,
+but is not treated as evidence for Apple's Option layer.
 
 ## Sources
 
 - The symbol positions are based on the macOS Hungarian layout and
   cross-referenced with:
   https://randomblog.hu/hungarian-macos-keyboard-guide-to-newbies/
+- Additional Mac HU symbol combinations:
+  https://github.com/leventemo/lvnt/blob/main/src/data/blog/_2023/keyboard-layouts.md
+- Four-level Hungarian ISO Windows/AltGr layout (not macOS):
+  https://magicutilities.net/magic-keyboard/help/keyboard-layouts/layout-mu?layout=Hungarian
 - Additional PC-style layout projects:
   https://github.com/gaborbata/mac-hun-keyboard and
   https://github.com/zaki/mac-hun-keyboard
