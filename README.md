@@ -8,8 +8,8 @@ previously-empty Option slots with useful dev/typing characters.
 Supports both **Hyprland** and **GNOME** (X11 or Wayland), selectable at
 install time.
 
-Built on top of the existing `hu(102_qwertz_comma_dead_mac)` xkb variant
-(already shipped with X.Org's `xkeyboard-config` package), with `Alt`
+Built on top of the existing `hu(102_qwertz_comma_dead)` xkb variant
+(shipped with X.Org's `xkeyboard-config` package), with `Alt`
 (Option) acting as the Level3 (AltGr-like) modifier via the
 `lv3:alt_switch` xkb option -- this makes **both** Alt keys behave like
 macOS's Option key, instead of only the right one.

@@ -24,14 +24,32 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-if grep -q "$MARKER" "$XKB_HU_FILE"; then
-    echo "Custom variant already present in $XKB_HU_FILE -- skipping append."
+tmp_file="$(mktemp "${XKB_HU_FILE}.tmp.XXXXXX")"
+trap 'rm -f "$tmp_file"' EXIT
+
+awk -v marker="$MARKER" '
+    index($0, marker) && !inside { inside = 1; next }
+    inside {
+        if ($0 ~ /^[[:space:]]*};[[:space:]]*$/) inside = 0
+        next
+    }
+    { lines[++count] = $0 }
+    END {
+        while (count > 0 && lines[count] ~ /^[[:space:]]*$/) count--
+        for (i = 1; i <= count; i++) print lines[i]
+    }
+' "$XKB_HU_FILE" > "$tmp_file"
+printf '\n' >> "$tmp_file"
+cat "$BLOCK_FILE" >> "$tmp_file"
+
+if cmp -s "$XKB_HU_FILE" "$tmp_file"; then
+    echo "Custom variant is up to date in $XKB_HU_FILE."
 else
-    echo "Backing up $XKB_HU_FILE to ${XKB_HU_FILE}.bak.$(date +%s)"
-    cp "$XKB_HU_FILE" "${XKB_HU_FILE}.bak.$(date +%s)"
-    echo "" >> "$XKB_HU_FILE"
-    cat "$BLOCK_FILE" >> "$XKB_HU_FILE"
-    echo "Appended custom variant to $XKB_HU_FILE"
+    backup="${XKB_HU_FILE}.bak.$(date +%Y%m%d%H%M%S)"
+    echo "Backing up $XKB_HU_FILE to $backup"
+    cp "$XKB_HU_FILE" "$backup"
+    cat "$tmp_file" > "$XKB_HU_FILE"
+    echo "Installed/updated custom variant in $XKB_HU_FILE"
 fi
 
 if [[ -z "$DE" ]]; then

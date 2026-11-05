@@ -1,5 +1,5 @@
 xkb_symbols "102_qwertz_comma_dead_mac_full" {
-    include "hu(102_qwertz_comma_dead_mac)"
+    include "hu(102_qwertz_comma_dead)"
     name[Group1] = "Hungarian (macOS-compatible, Apple Aluminium)";
 
     // @ already correct: Alt+q = at (kept from base)
@@ -21,9 +21,6 @@ xkb_symbols "102_qwertz_comma_dead_mac_full" {
 
     // © = Alt+g
     key <AC05> { [ g, G, copyright, ENG ] };
-    // clear the now-vacated bracketleft that used to live on f
-    // (VoidSymbol truly blanks the level; NoSymbol would just inherit the old value)
-    key <AC04> { [ f, F, VoidSymbol, ordfeminine ] };
 
     // ; = Alt+, (comma's own Alt); : = Alt+. (period's own Alt) -- no more duplication
     key <AB08> { [ comma, question, semicolon, asterisk ] };
@@ -47,21 +44,12 @@ xkb_symbols "102_qwertz_comma_dead_mac_full" {
     // Remove leftover "vanilla PC Hungarian" AltGr duplicates so every
     // symbol has exactly one, native-mac position (per user request: no
     // Windows-style AltGr+v=@ etc. left over from the base hu(...) layout).
-    key <AB04> { [ v, V, VoidSymbol, singlelowquotemark ] };      // was Alt+v = @ (dup of Alt+q)
-    key <AD01> { [ q, Q, at, VoidSymbol ] };                      // was Alt+Shift+q = \ (dup of Alt+ü)
-    key <AB03> { [ c, C, VoidSymbol, VoidSymbol ] };              // was Alt+c = & (dup of Alt+1), Alt+Shift+c = © (dup of Alt+g)
     key <AC08> { [ k, K, lstroke, VoidSymbol ] };                 // was Alt+Shift+k = & (dup of Alt+1)
-    key <AB05> { [ b, B, VoidSymbol, leftsinglequotemark ] };     // was Alt+b = { (dup of Alt+7)
-    key <AB06> { [ n, N, VoidSymbol, rightsinglequotemark ] };    // was Alt+n = } (dup of Alt+ö)
-    key <AB10> { [ minus, underscore, VoidSymbol, dead_abovedot ] }; // was Alt+- = * (dup of Alt+Shift+,)
     key <AB02> { [ x, X, guillemotright, VoidSymbol ] };          // Alt+x = »; Alt+Shift+x dup > removed (LSGT owns </>)
     key <AC10> { [ eacute, Eacute, VoidSymbol, cent ] };          // was Alt+é = $ (dup of Alt+Shift+4)
 
     // Alt+y / Alt+x = double angle quotes («/»), per user request ("dupla nyíl")
     key <AB01> { [ y, Y, guillemotleft, VoidSymbol ] };           // Alt+y = «; Alt+Shift+y dup < removed (LSGT owns </>)
-
-    // Remove duplicate < from M/Alt -- LSGT is now the sole home of </>
-    key <AB07> { [ m, M, VoidSymbol, masculine ] };
 
     // Fill remaining empty (VoidSymbol) slots with practical dev/typing symbols
     key <AC04> { [ f, F, function, ordfeminine ] };               // Alt+f = ƒ (function symbol)
