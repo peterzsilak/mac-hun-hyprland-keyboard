@@ -1,143 +1,277 @@
-# Mac Hungarian keyboard layout for Hyprland / GNOME on Arch Linux
+# Magyar macOS-billentyűzet Arch Linuxon
 
-A custom `hu` xkb keyboard variant, `102_qwertz_comma_dead_mac_full`, that
-replicates the macOS Hungarian (Apple Aluminium ISO) keyboard's native
-Option-key symbol placement on Linux, with a few deliberate deviations
-(see below) to remove duplicate symbol positions and fill
-previously-empty Option slots with useful dev/typing characters.
-Supports both **Hyprland** and **GNOME** (X11 or Wayland), selectable at
-install time.
+Ez a projekt a magyar, numerikus blokkos **Apple Aluminium ISO**
+billentyűzet macOS-es karakterkiosztását teszi használhatóvá Arch Linuxon.
+GNOME-hoz és Hyprlandhez tartalmaz beállításokat.
 
-Built on top of the existing `hu(102_qwertz_comma_dead)` xkb variant
-(shipped with X.Org's `xkeyboard-config` package), with `Alt`
-(Option) acting as the Level3 (AltGr-like) modifier via the
-`lv3:alt_switch` xkb option -- this makes **both** Alt keys behave like
-macOS's Option key, instead of only the right one.
+Az egyedi XKB-változat neve:
+`hu+102_qwertz_comma_dead_mac_full`. A magyar alapkaraktereket megtartja,
+az Option-réteg (`Alt`) macOS-es szimbólumait pedig az Apple-kiosztáshoz
+igazítja. Az AltGr-szerű réteget **mindkét Alt billentyű** aktiválja.
+A numerikus blokk magyar kiosztásának megfelelően vesszőt használ
+tizedesjelként.
 
-## What's included
+> **Fontos:** a billentyűzet fizikai kiosztásának ISO-nak kell lennie.
+> A rendszer területi beállítása (például `hu_HU.UTF-8`) önmagában nem
+> választ ki billentyűzetkiosztást.
 
-- `xkb/hu-symbols-custom-block.txt` -- the `xkb_symbols
-  "102_qwertz_comma_dead_mac_full"` block to install in
-  `/usr/share/X11/xkb/symbols/hu`. The installer also registers the
-  variant in XKB's `evdev.xml` and `base.xml` rules so GNOME can load it.
-- `hypr/input.lua` -- example Hyprland Lua input config enabling the
-  layout.
-- `hypr/keybinds-snippet.lua` -- an extra Ctrl+Alt+E -> € keybind (via
-  `wtype`), matching macOS's Alt+E shortcut for the Euro sign (in addition
-  to the native Alt+U bonus mapping baked into the layout itself).
-- `gnome/apply-gnome-settings.sh` -- GNOME counterpart: sets the input
-  source via `gsettings`, enables `lv3:alt_switch`, swaps Ctrl<->Super
-  (Cmd) so Mac shortcuts (Cmd+C/V/...) land on the key GNOME treats as
-  Ctrl, and registers the Ctrl+Alt+E -> € custom keybinding.
-- `gnome/apply-mac-finder-shortcuts.sh` -- adds the rest of the macOS
-  Finder hotkey set (see [support.apple.com/en-us/102650](https://support.apple.com/en-us/102650))
-  that doesn't already come for free from the Ctrl/Cmd swap: folder
-  shortcuts, Empty Trash, and Mission-Control-ish window switching. See
-  the mapping table below for what's automatic vs. custom vs. skipped.
-- `gnome/lib-custom-keybinding.sh` -- shared helper used by the two
-  scripts above to register GNOME custom keybindings.
-- `install.sh` -- installs the xkb variant (with automatic backup of the
-  original `hu` symbols file), asks whether you're on Hyprland or GNOME
-  (or pass `--de=hyprland`/`--de=gnome`), and prints/applies the
-  remaining steps.
+## Telepítés nulláról – GNOME (Arch Linux)
 
-## Installation
+Az alábbi lépéseket azon a gépen kell elvégezni, amelyiken a kiosztást
+használni szeretnéd.
+
+### 1. Előfeltételek
+
+- Arch Linux, GNOME-munkamenet és `sudo` jogosultság.
+- `xkeyboard-config`, amely az XKB magyar alapkiosztást tartalmazza.
+- `libxkbcommon` az `xkbcli` ellenőrző parancsokhoz (a GNOME általában
+  már telepíti).
+- Git a projekt letöltéséhez.
+- Az eurójelhez tartozó opcionális `Ctrl+Alt+E` gyorsbillentyűhöz:
+  `wtype` Wayland-munkamenetben vagy `xdotool` X11-munkamenetben.
+  Ezek nélkül is beírható az eurójel az `Alt+U` kombinációval.
+
+Friss Arch rendszeren:
 
 ```sh
-git clone <this-repo>
-cd mac-hun-hyprland-keyboard
-sudo ./install.sh            # prompts for Hyprland or GNOME
-# or non-interactively:
-sudo ./install.sh --de=gnome
-sudo ./install.sh --de=hyprland
+sudo pacman -Syu --needed git xkeyboard-config libxkbcommon
 ```
 
-### Hyprland
+Wayland alatt, ha használni szeretnéd a `Ctrl+Alt+E` gyorsbillentyűt:
 
-Follow the printed instructions to update `hypr/input.lua` /
-`hypr/keybinds-snippet.lua` in your own config and run `hyprctl reload`.
+```sh
+sudo pacman -S --needed wtype
+```
 
-### GNOME
+X11 alatt ehelyett:
 
-After `install.sh` finishes, run the following as your **normal desktop
-user** (not root/sudo), then log out/in:
+```sh
+sudo pacman -S --needed xdotool
+```
+
+### 2. A projekt letöltése
+
+```sh
+git clone https://github.com/peterzsilak/mac-hun-hyprland-keyboard.git
+cd mac-hun-hyprland-keyboard
+```
+
+### 3. Az XKB-kiosztás rendszerszintű telepítése
+
+```sh
+sudo ./install.sh --de=gnome
+```
+
+A telepítő a kiosztást a `/usr/share/X11/xkb/symbols/hu` fájlba telepíti,
+és bejegyzi az XKB `evdev.xml` és `base.xml` szabályfájljaiba, hogy a GNOME
+fel tudja ismerni. Módosítás előtt mindhárom fájlról időbélyeges biztonsági
+másolatot készít. A telepítő biztonságosan újrafuttatható.
+
+### 4. A GNOME-felhasználói beállítások alkalmazása
+
+Ezt a lépést a saját, bejelentkezett asztali felhasználóddal futtasd,
+**ne `sudo`-val**:
 
 ```sh
 ./gnome/apply-gnome-settings.sh
+```
+
+A parancs beállítja az egyedi kiosztást, mindkét Alt billentyűt Optionként
+használja, felcseréli a Ctrl és Super billentyűket a Mac-féle
+Command/Ctrl-izommemóriához, és regisztrálja a `Ctrl+Alt+E` → `€`
+gyorsbillentyűt. Ez a felhasználó GNOME-beállításait módosítja, nem a
+rendszer többi felhasználójáét.
+
+### 5. A GNOME újraindítása
+
+Jelentkezz ki **teljesen** a GNOME-munkamenetből, majd jelentkezz vissza.
+A képernyő zárolása vagy a terminál bezárása nem elég; a gép újraindítása
+nem szükséges. A munkamenet újraindítása után teszteld a billentyűket.
+
+### 6. Gyors ellenőrzés
+
+Az `Alt+Q` kombinációnak `@` jelet, az `Alt+U` kombinációnak `€` jelet
+kell adnia. Az ékezetes magyar betűk a fizikai magyar Apple-billentyűzet
+alapbillentyűin maradnak; például az `é`, `á`, `ű` és `ő` billentyűk
+Alt nélkül működnek.
+
+Ellenőrizheted a mentett GNOME-forrást és az XKB katalógusbejegyzését is:
+
+```sh
+gsettings get org.gnome.desktop.input-sources sources
+gsettings get org.gnome.desktop.input-sources current
+gsettings get org.gnome.desktop.input-sources xkb-options
+xkbcli list | grep -A 5 '102_qwertz_comma_dead_mac_full'
+```
+
+A forrásnak ezt kell tartalmaznia:
+`('xkb', 'hu+102_qwertz_comma_dead_mac_full')`; az `xkb-options` listában
+pedig szerepelnie kell az `lv3:alt_switch` opciónak. Az `xkbcli list`
+kimenetében a `Hungarian (macOS-compatible, Apple Aluminium)` leírás
+jelenjen meg. Az `xkbcli` a `libxkbcommon` csomag része.
+
+## GNOME Finder-gyorsbillentyűk (opcionális)
+
+A Finderhez hasonló extra mappaváltó, kukaürítő és ablakváltó
+gyorsbillentyűket külön kapcsolhatod be, normál felhasználóként:
+
+```sh
 ./gnome/apply-mac-finder-shortcuts.sh
 ```
 
-This swaps Ctrl and Super (Cmd) system-wide, matching the Mac's physical
-key layout muscle memory, in addition to enabling the Option-key symbol
-layer, the € shortcut, and the macOS Finder hotkey set below.
+Ehhez GNOME és a `gsettings` kell. A mappaparancsokhoz a Nautilus
+(`nautilus`), a kukaürítéshez pedig a `gio` szükséges. A script figyelmeztet,
+ha a Nautilus nem található. **A `Shift+Ctrl+Delete` azonnal kiüríti a
+kukát, megerősítés nélkül.**
 
-## macOS Finder shortcut mapping (GNOME)
-
-Reference: [support.apple.com/en-us/102650](https://support.apple.com/en-us/102650).
-Legend: ✅ automatic (works once Ctrl/Cmd are swapped, because Nautilus
-already uses the same Ctrl+letter as Finder uses Cmd+letter), 🔧 custom
-keybinding added by `apply-mac-finder-shortcuts.sh`, ⚠️ no sane Linux
-equivalent -- intentionally skipped.
-
-| macOS shortcut | Meaning | Linux/GNOME |
+| macOS-billentyű | Funkció | GNOME-megfelelő |
 |---|---|---|
-| Cmd-D | Duplicate | ✅ Nautilus `Ctrl-D` |
-| Cmd-F | Search | ✅ Nautilus `Ctrl-F` |
-| Cmd-R | Refresh/original | ✅ `Ctrl-R` |
-| Cmd-N | New window | ✅ Nautilus `Ctrl-N` |
-| Cmd-T | New tab | ✅ Nautilus `Ctrl-T` |
-| Cmd-1 / Cmd-2 | Icon / list view | ✅ Nautilus `Ctrl-1` / `Ctrl-2` |
-| Cmd-3 / Cmd-4 | Columns / gallery view | ⚠️ not in modern GTK4 Nautilus |
-| Cmd-[ / Cmd-] | Back / forward folder | ✅ Nautilus `Ctrl-[` / `Ctrl-]` |
-| Cmd-Up | Open parent folder | ✅ Nautilus `Ctrl-Up` |
-| Cmd-Down | Open selected item | ✅ Nautilus `Ctrl-Down`/`Ctrl-O` |
-| Cmd-Delete | Move to Trash | ✅ plain `Delete` already trashes in Nautilus |
-| Shift-Cmd-N | New folder | ✅ Nautilus `Ctrl-Shift-N` |
-| Shift-Cmd-H | Home folder | 🔧 `Shift-Ctrl-H` opens `nautilus $HOME` |
-| Shift-Cmd-D | Desktop folder | 🔧 `Shift-Ctrl-D` opens `~/Desktop` |
-| Shift-Cmd-O | Documents folder | 🔧 `Shift-Ctrl-O` opens `~/Documents` |
-| Option-Cmd-L | Downloads folder | 🔧 `Alt-Ctrl-L` opens `~/Downloads` |
-| Shift-Cmd-C | Computer window | 🔧 `Shift-Ctrl-C` opens `computer:///` |
-| Shift-Cmd-K | Network window | 🔧 `Shift-Ctrl-K` opens `network:///` |
-| Shift-Cmd-F | Recents window | 🔧 `Shift-Ctrl-F` opens `recent:///` |
-| Shift-Cmd-Delete | Empty Trash | 🔧 `Shift-Ctrl-Delete` runs `gio trash --empty` |
-| Option-Shift-Cmd-Delete | Empty Trash, no confirm | 🔧 same binding (CLI has no confirm dialog) |
-| Shift-Cmd-G | Go to Folder dialog | ✅ Nautilus `Ctrl-L` (location bar) covers this |
-| Cmd-K | Connect to Server | ✅ Nautilus `Ctrl-L`, type `smb://`/`ssh://`/etc. |
-| Cmd-Y / Option-Cmd-Y | Quick Look / slideshow | ✅ `Space` via the `gnome-sushi` package |
-| Control-Space | Switch input source | ✅ becomes `Super-Space` after the swap, GNOME's default |
-| Control-Up Arrow | Mission Control | 🔧 `Ctrl-Up` -> Activities overview |
-| Control-Down Arrow | Show all windows of front app | 🔧 `Ctrl-Down` -> cycle windows of current app |
-| Shift-Cmd-I, Shift-Cmd-R (AirDrop/iCloud), Shift-Cmd-U (Utilities), Shift-Cmd-P/T (preview/tab bar toggle), Control-Cmd-A (alias), Control-Cmd-T (sidebar), Option-Cmd-D (Dock toggle), Option-Cmd-P/S (path/sidebar toggle), Cmd-J (view options), Cmd-/ (status bar) | Finder-only UI toggles / macOS-only features | ⚠️ no equivalent GNOME/Nautilus feature |
-| Fn-A/C/D/N, Fn-Shift-A (Dock, Control Center, Dictation, Notification Center, Launchpad) | Fn-row shortcuts | ⚠️ Fn behavior is Apple-firmware-specific, not portable via xkb |
-| Option/Cmd-drag, Option-double-click | Mouse-modifier behaviors | ⚠️ different modifier convention on GNOME (`Ctrl`-drag = copy already, unrelated to this swap) |
-| Brightness/Volume + Option/Control combos | Open related Settings panel / fine adjustment | ⚠️ hardware/media-key dependent, out of scope |
+| Cmd-D, Cmd-F, Cmd-R | Duplikálás, keresés, frissítés | Nautilusban Ctrl-D, Ctrl-F, Ctrl-R |
+| Cmd-N, Cmd-T | Új ablak, új lap | Nautilusban Ctrl-N, Ctrl-T |
+| Cmd-1 / Cmd-2 | Ikon-/listanézet | Nautilusban Ctrl-1 / Ctrl-2 |
+| Cmd-3 / Cmd-4 | Oszlop-/galérianézet | Nincs megfelelő a modern GTK4 Nautilusban |
+| Cmd-[ / Cmd-] | Vissza / előre | Nautilusban Ctrl-[ / Ctrl-] |
+| Cmd-Fel / Cmd-Le | Szülőmappa / kijelölt elem megnyitása | Nautilusban Ctrl-Fel / Ctrl-Le vagy Ctrl-O |
+| Cmd-Delete | Áthelyezés a kukába | Nautilusban Delete |
+| Shift-Cmd-N | Új mappa | Nautilusban Ctrl-Shift-N |
+| Shift-Cmd-H / D / O | Home / Asztal / Dokumentumok | Egyedi GNOME-gyorsbillentyű |
+| Option-Cmd-L | Letöltések | Egyedi GNOME-gyorsbillentyű |
+| Shift-Cmd-C / K / F | Számítógép / hálózat / legutóbbiak | Egyedi GNOME-gyorsbillentyű |
+| Shift-Cmd-Delete | Kuka ürítése | Egyedi gyorsbillentyű, megerősítés nélkül |
+| Cmd-Y / Option-Cmd-Y | Quick Look / diavetítés | Space a `gnome-sushi` telepítése után |
+| Ctrl-Space | Bemeneti forrás váltása | Super-Space a Ctrl/Super csere után |
+| Ctrl-Fel / Ctrl-Le | Mission Control / alkalmazás ablakai | GNOME Áttekintés / alkalmazás ablakainak váltása |
+| AirDrop, iCloud, Dock, Fn-sor és Finder-specifikus kapcsolók | macOS-funkciók | Nincs közvetlen Linux-megfelelő |
 
-## Symbol reference (current layout)
+A GNOME Finder-script a Nautilus navigációs gyorsbillentyűin kívül a
+fenti egyedi mappaparancsokat, kukaürítést és ablakműveleteket állítja be.
+Egyes Finder-funkciók operációsrendszer-specifikusak, ezért nem részei a
+projektnek.
 
-Legend: Base / Shift / **Alt** / Alt+Shift. "–" = empty (`VoidSymbol`).
+## Telepítés – Hyprland
 
-### Number row
+Az első három GNOME-telepítési lépés ugyanúgy érvényes, de a telepítőt
+Hyprland célmegjelöléssel futtasd:
 
-| Key | Base | Shift | Alt | Alt+Shift |
+```sh
+sudo ./install.sh --de=hyprland
+```
+
+Ezután a Hyprland saját konfigurációjába illeszd be a következő
+billentyűzet-beállításokat:
+
+```ini
+input {
+    kb_layout = hu
+    kb_variant = 102_qwertz_comma_dead_mac_full
+    kb_model = applealu_iso
+    kb_options = lv3:alt_switch
+}
+```
+
+Ha már létezik `input` blokk, a sorokat abba illeszd be; ne hozz létre
+ütköző, párhuzamos beállításokat. Ezután:
+
+```sh
+hyprctl reload
+```
+
+A `hypr/input.lua` egy Lua-alapú Hyprland konfigurációs keretrendszerhez
+készült példa, nem másolható közvetlenül minden Hyprland-konfigurációba.
+A projekt `hypr/keybinds-snippet.lua` fájlja opcionális `Ctrl+Alt+E` → `€`
+gyorsbillentyűt mutat be ugyanahhoz a Lua keretrendszerhez. Az eurójel az
+alapkiosztásban az `Alt+U` kombinációval enélkül is elérhető.
+
+## Frissítés és hibaelhárítás
+
+### A GNOME még az előző kiosztást használja
+
+Ellenőrizd a beállított forrást:
+
+```sh
+gsettings get org.gnome.desktop.input-sources sources
+gsettings get org.gnome.desktop.input-sources current
+```
+
+Ezután ellenőrizd, hogy az XKB ismeri-e az egyedi változatot:
+
+```sh
+xkbcli list | grep -A 5 '102_qwertz_comma_dead_mac_full'
+xkbcli compile-keymap \
+    --layout hu \
+    --variant 102_qwertz_comma_dead_mac_full \
+    --model applealu_iso \
+    --options lv3:alt_switch \
+    --test
+```
+
+Ha a forrás helyes, de a betűk továbbra sem a kívántak, jelentkezz ki a
+GNOME-ból, majd vissza. Ha az egyedi változat nincs az `xkbcli list`
+kimenetében, futtasd újra rendszergazdaként a telepítőt, majd jelentkezz
+ki és vissza:
+
+```sh
+sudo ./install.sh --de=gnome
+```
+
+Az `xkeyboard-config` frissítése felülírhatja a csomag által kezelt XKB
+fájlokat. Ilyen frissítés után futtasd újra a telepítőt; az friss
+biztonsági másolatot készít, és szükség esetén újra bejegyzi a változatot.
+Ezután jelentkezz ki és vissza.
+
+### A `Ctrl+Alt+E` nem ír eurójelet
+
+Az `Alt+U` → `€` kiosztás része, ezért ezt használd kerülő megoldásként.
+A külön gyorsbillentyű Wayland alatt `wtype`, X11 alatt `xdotool` programot
+igényel. Telepítsd a munkamenetednek megfelelő csomagot, majd normál
+felhasználóként futtasd újra:
+
+```sh
+./gnome/apply-gnome-settings.sh
+```
+
+## Mit telepít a projekt?
+
+- `xkb/hu-symbols-custom-block.txt` – az egyedi magyar XKB-változat.
+- `install.sh` – rendszerszinten telepíti a változatot, és bejegyzi az
+  `evdev.xml` és `base.xml` XKB-szabályfájlokba. A módosított fájlokról
+  időbélyeges biztonsági másolatot készít.
+- `gnome/apply-gnome-settings.sh` – normál felhasználóként beállítja a
+  GNOME-bemeneti forrást és a kapcsolódó billentyűopciókat.
+- `gnome/apply-mac-finder-shortcuts.sh` – opcionális GNOME Finder-szerű
+  gyorsbillentyűk.
+- `gnome/lib-custom-keybinding.sh` – a GNOME-parancsok közös segédje.
+- `hypr/input.lua` – példa Lua-alapú Hyprland-konfigurációhoz.
+- `hypr/keybinds-snippet.lua` – opcionális eurójel-gyorsbillentyű ugyanahhoz
+  a Lua-konfigurációhoz.
+
+## Kiosztás
+
+A táblázatok sorrendje: **alap / Shift / Alt / Alt+Shift**. A „–” üres
+billentyűszintet (`VoidSymbol`) jelöl. Az Alt a macOS Option billentyűjének
+felel meg.
+
+### Számsor
+
+| Billentyű | Alap | Shift | Alt | Alt+Shift |
 |---|---|---|---|---|
-| § (TLDE) | 0 | § | ¬ | ¬ |
-| 1 | 1 | ' | & | ~(dead) |
-| 2 | 2 | " | ˇ(dead) | ˇ |
-| 3 | 3 | + | ^(dead) | # |
-| 4 | 4 | ! | ˘(dead) | $ |
-| 5 | 5 | % | ˚(dead) | ° |
-| 6 | 6 | / | ˛(dead) | ˛ |
-| 7 | 7 | = | { | `(dead) |
+| § | 0 | § | ¬ | ¬ |
+| 1 | 1 | ' | & | ~(halott) |
+| 2 | 2 | " | ˇ(halott) | ˇ |
+| 3 | 3 | + | ^(halott) | # |
+| 4 | 4 | ! | ˘(halott) | $ |
+| 5 | 5 | % | ˚(halott) | ° |
+| 6 | 6 | / | ˛(halott) | ˛ |
+| 7 | 7 | = | { | `(halott) |
 | 8 | 8 | ( | [ | ˙ |
 | 9 | 9 | ) | ] | ´ |
 | Ö | ö | Ö | } | ˝ |
 | Ü | ü | Ü | \ | ¨ |
-| Ó | ó | Ó | ¸(dead) | ¸ |
+| Ó | ó | Ó | ¸(halott) | ¸ |
 
-### Top letter row
+### Felső betűsor
 
-| Key | Base | Shift | Alt | Alt+Shift |
+| Billentyű | Alap | Shift | Alt | Alt+Shift |
 |---|---|---|---|---|
 | Q | q | Q | @ | ™ |
 | W | w | W | \| | § |
@@ -149,12 +283,12 @@ Legend: Base / Shift / **Alt** / Alt+Shift. "–" = empty (`VoidSymbol`).
 | I | i | I | Í | í |
 | O | o | O | „ | Ø |
 | P | p | P | " | Þ |
-| Ő | ő | Ő | ÷ | ˝(dead) |
-| Ú | ú | Ú | ~ | ¯(dead) |
+| Ő | ő | Ő | ÷ | ˝(halott) |
+| Ú | ú | Ú | ~ | ¯(halott) |
 
-### Home row
+### Középső betűsor
 
-| Key | Base | Shift | Alt | Alt+Shift |
+| Billentyű | Alap | Shift | Alt | Alt+Shift |
 |---|---|---|---|---|
 | A | a | A | ä | Ä |
 | S | s | S | đ | ẞ |
@@ -167,13 +301,13 @@ Legend: Base / Shift / **Alt** / Alt+Shift. "–" = empty (`VoidSymbol`).
 | L | l | L | Ł | Ł |
 | É | é | É | – | ¢ |
 | Á | á | Á | ß | ẞ |
-| Ű | ű | Ű | ` | ˘(dead) |
+| Ű | ű | Ű | ` | ˘(halott) |
 
-### Bottom row
+### Alsó betűsor
 
-| Key | Base | Shift | Alt | Alt+Shift |
+| Billentyű | Alap | Shift | Alt | Alt+Shift |
 |---|---|---|---|---|
-| Í (LSGT) | í | Í | < | > |
+| Í (ISO-billentyű) | í | Í | < | > |
 | Y | y | Y | « | – |
 | X | x | X | » | – |
 | C | c | C | © | Ç |
@@ -183,26 +317,23 @@ Legend: Base / Shift / **Alt** / Alt+Shift. "–" = empty (`VoidSymbol`).
 | M | m | M | – | º |
 | , | , | ? | ; | * |
 | . | . | : | … | ÷ |
-| - | - | _ | — | ˙(dead) |
+| - | - | _ | — | ˙(halott) |
 
-## Deliberate deviations from the stock macOS Hungarian layout
+## Eltérések a macOS magyar kiosztásától
 
-- `<` / `>` live exclusively on the ISO key next to left Shift (labelled
-  Í), matching the physical Hungarian ISO keyboard convention, instead of
-  being duplicated across M / Y / X as in the stock layout.
-- `Alt+Y` / `Alt+X` produce « / » (guillemets) instead of duplicating </>.
-- `Alt+.` produces … (ellipsis) instead of a duplicate `:`.
-- Previously empty Option slots (F, C, V, B, N, -, Shift+Q) are filled with
-  ƒ, ©/Ç, √, ≈, ≠, — (em dash), and ™ respectively.
-- `Alt+ú` = `~` (tilde) and `Alt+ű` = `` ` `` (backtick), placed for
-  Linux/programming muscle memory rather than the stock macOS positions.
+- A `<` és `>` kizárólag a bal Shift melletti ISO-billentyűn található,
+  nem ismétlődik az M, Y és X billentyűkön.
+- Az `Alt+Y` és `Alt+X` « és » jelet ad.
+- Az `Alt+.` ellipszist (`…`) ad.
+- A macOS kiosztásban üres Option-helyek egy része hasznos karaktert kapott:
+  `ƒ`, `©`/`Ç`, `√`, `≈`, `≠`, `—` és `™`.
+- Az `Alt+ú` tilde (`~`), az `Alt+ű` backtick (`` ` ``), programozási
+  kényelmi okból.
 
-## Background / sources
+## Források
 
-- Base symbol positions derived from the stock macOS Hungarian keyboard,
-  cross-referenced with
+- A szimbólumok alapja a macOS magyar kiosztása, összevetve ezzel:
   https://randomblog.hu/hungarian-macos-keyboard-guide-to-newbies/
-- PC-style alternate layout philosophies considered (but not adopted, per
-  user preference for a native Mac-style layout) from
-  https://github.com/gaborbata/mac-hun-keyboard and
+- További, PC-s kiosztásokról szóló projektek:
+  https://github.com/gaborbata/mac-hun-keyboard és
   https://github.com/zaki/mac-hun-keyboard
