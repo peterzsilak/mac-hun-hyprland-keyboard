@@ -39,17 +39,24 @@ if ! command -v nautilus >/dev/null 2>&1; then
     echo "still be registered, but won't do anything until it's installed." >&2
 fi
 
+# GNOME launches custom commands without a shell, so environment variables
+# such as $HOME are not expanded. Quote paths for GNOME's argv parser instead.
+quote_command_arg() {
+    local value="${1//\'/\'\\\'\'}"
+    printf "'%s'" "$value"
+}
+
 echo "Registering Finder-style folder shortcuts (Shift+Ctrl+<key>," \
      "i.e. physical Shift+Cmd+<key> after the swap)..."
 
 register_custom_keybinding "mac-finder-home" "Mac: Home folder" \
-    "nautilus \$HOME" "<Shift><Ctrl>h"
+    "nautilus $(quote_command_arg "$HOME")" "<Shift><Ctrl>h"
 register_custom_keybinding "mac-finder-desktop" "Mac: Desktop folder" \
-    "nautilus \$HOME/Desktop" "<Shift><Ctrl>d"
+    "nautilus $(quote_command_arg "$HOME/Desktop")" "<Shift><Ctrl>d"
 register_custom_keybinding "mac-finder-documents" "Mac: Documents folder" \
-    "nautilus \$HOME/Documents" "<Shift><Ctrl>o"
+    "nautilus $(quote_command_arg "$HOME/Documents")" "<Shift><Ctrl>o"
 register_custom_keybinding "mac-finder-downloads" "Mac: Downloads folder" \
-    "nautilus \$HOME/Downloads" "<Alt><Ctrl>l"
+    "nautilus $(quote_command_arg "$HOME/Downloads")" "<Alt><Ctrl>l"
 register_custom_keybinding "mac-finder-computer" "Mac: Computer window" \
     "nautilus computer:///" "<Shift><Ctrl>c"
 register_custom_keybinding "mac-finder-network" "Mac: Network window" \
