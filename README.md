@@ -1,5 +1,7 @@
 # Magyar macOS-billentyűzet Arch Linuxon
 
+[Magyar](README.md) | [English](README.en.md)
+
 Ez a projekt a magyar, numerikus blokkos **Apple Aluminium ISO**
 billentyűzet macOS-es karakterkiosztását teszi használhatóvá Arch Linuxon.
 GNOME-hoz és Hyprlandhez tartalmaz beállításokat.
